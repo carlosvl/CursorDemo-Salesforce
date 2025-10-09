@@ -9,6 +9,7 @@ This project follows the standard Salesforce DX project structure:
 - `force-app/` - Contains the source code for your Salesforce application
 - `config/` - Project configuration files including scratch org definitions
 - `scripts/` - Utility scripts for development tasks
+- `deployment/` - Ready-to-deploy packages for individual solutions
 - `sfdx-project.json` - Main project configuration file
 
 ## 🚀 Solutions Included
@@ -38,7 +39,26 @@ A Screen Flow solution that simplifies taxi trip logging in Net Zero Cloud by el
 
 **Documentation:** See `TAXI_TRIP_SOLUTION.md` for detailed implementation guide.
 
-### 3. 📋 Technical Documentation
+### 3. 📊 Annual Emission Inventory LWC
+**Files:** 
+- `force-app/main/default/lwc/annualEmissionInventoryList/` - Lightning Web Component
+- `force-app/main/default/classes/AnnualEmissionInventoryController.cls` - Apex Controller
+- `force-app/main/default/classes/AnnualEmissionInventoryControllerTest.cls` - Test Class
+
+A comprehensive Lightning Web Component solution for Net Zero Cloud that displays Annual Emission Inventory records with related Carbon Footprints on Account pages.
+
+**Features:**
+- Interactive data table showing Annual Emission Inventory records for Accounts
+- Row selection with "View Details" button functionality
+- Related Carbon Footprint display in beautiful responsive cards
+- Smart emission value formatting (max 4 decimal places)
+- Real-time data integration with Net Zero Cloud objects
+- Responsive design for desktop and mobile
+- Comprehensive error handling and empty state management
+
+**Deployment Package:** `deployment/AnnualEmissionInventoryLWC-Deployment.zip` - Complete deployment package with instructions
+
+### 4. 📋 Technical Documentation
 **File:** `TAXI_TRIP_SOLUTION.md`
 
 Comprehensive documentation covering:
@@ -109,6 +129,19 @@ sf project deploy start --source-dir force-app/main/default/flows/Simple_Distanc
 sf project deploy start --source-dir force-app/main/default/flows/
 ```
 
+### Deploy Annual Emission Inventory LWC:
+```bash
+# Deploy complete LWC solution
+sf project deploy start --source-dir force-app/main/default/lwc/annualEmissionInventoryList/
+sf project deploy start --source-dir force-app/main/default/classes/AnnualEmissionInventoryController.cls
+sf project deploy start --source-dir force-app/main/default/classes/AnnualEmissionInventoryControllerTest.cls
+
+# Or deploy from the deployment package
+cd deployment
+unzip AnnualEmissionInventoryLWC-Deployment.zip
+sf project deploy start --source-dir AnnualEmissionInventoryLWC/
+```
+
 ## Development Workflow
 
 This project uses the scratch org development model. Key commands:
@@ -147,6 +180,12 @@ When contributing new solutions, please:
 - [Flow Builder Documentation](https://help.salesforce.com/s/articleView?id=sf.flow.htm)
 - [Record-Triggered Flows](https://help.salesforce.com/s/articleView?id=sf.flow_concepts_trigger.htm)
 - [Screen Flows](https://help.salesforce.com/s/articleView?id=sf.flow_concepts_screen_flow.htm)
+
+### Lightning Web Components
+- [Lightning Web Components Developer Guide](https://developer.salesforce.com/docs/component-library/documentation/en/lwc)
+- [Lightning Design System](https://www.lightningdesignsystem.com/)
+- [Lightning Base Components](https://developer.salesforce.com/docs/component-library/overview/components)
+- [LWC Recipes](https://github.com/trailheadapps/lwc-recipes)
 
 ### Net Zero Cloud Specific
 - [Net Zero Cloud Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.netzero_cloud_dev_guide.meta/netzero_cloud_dev_guide/netzero_cloud_std_objects_intro.htm)

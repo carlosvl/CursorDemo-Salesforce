@@ -22,11 +22,49 @@
     line-height: 1.5;
 }
 
+/* Carbon Footprint Cards */
+.carbon-footprint-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.carbon-footprint-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.1);
+}
+
+.footprint-emission-value {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #027e46;
+}
+
+.footprint-emission-unit {
+    font-size: 0.75rem;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.0625rem;
+}
+
+.footprint-type-header {
+    font-weight: 600;
+    color: #181818;
+}
+
+/* Selection indicator */
+.selected-row-indicator {
+    background-color: #f3f9ff;
+    border-left: 3px solid #0176d3;
+}
+
 /* Responsive design for mobile */
 @media (max-width: 768px) {
     .slds-p-horizontal_medium {
         padding-left: 0.5rem;
         padding-right: 0.5rem;
+    }
+    
+    .carbon-footprint-card {
+        margin-bottom: 1rem;
     }
 }
 
@@ -44,4 +82,9 @@
     font-size: 0.875rem;
     font-weight: 500;
     margin: 0;
+}
+
+/* Card spacing */
+.slds-m-top_medium {
+    margin-top: 1rem;
 }
