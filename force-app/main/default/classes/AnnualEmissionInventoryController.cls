@@ -58,13 +58,13 @@ public with sharing class AnnualEmissionInventoryController {
      * @return List of Carbon Footprint records from different sources
      */
     @AuraEnabled(cacheable=true)
-    public static List<CarbonFootprintWrapper> getCarbonFootprints(String inventoryId) {
+    public static List<CarbonFootprintSummary> getCarbonFootprints(String inventoryId) {
         try {
             if (String.isBlank(inventoryId)) {
                 throw new AuraHandledException('Inventory ID is required');
             }
 
-            List<CarbonFootprintWrapper> allFootprints = new List<CarbonFootprintWrapper>();
+            Map<String, CarbonFootprintSummary> summaryMap = new Map<String, CarbonFootprintSummary>();
 
             // 1. Get Stationary Asset Carbon Footprints
             if (Schema.sObjectType.StnryAssetCrbnFtprnt.isAccessible()) {
@@ -74,11 +74,28 @@ public with sharing class AnnualEmissionInventoryController {
                     FROM StnryAssetCrbnFtprnt 
                     WHERE AnnualEmssnInventoryId = :inventoryId
                     ORDER BY CreatedDate DESC
-                    LIMIT 10
                 ];
 
-                for (StnryAssetCrbnFtprnt footprint : stationaryFootprints) {
-                    allFootprints.add(new CarbonFootprintWrapper(footprint, 'Stationary Asset'));
+                if (!stationaryFootprints.isEmpty()) {
+                    CarbonFootprintSummary summary = new CarbonFootprintSummary();
+                    summary.type = 'Stationary Asset';
+                    summary.recordCount = stationaryFootprints.size();
+                    summary.totalEmissions = 0;
+                    summary.scope1Emissions = 0;
+                    summary.scope2Emissions = 0;
+                    summary.scope3Emissions = 0;
+                    
+                    for (StnryAssetCrbnFtprnt footprint : stationaryFootprints) {
+                        Decimal downstream = footprint.TotalScp3DnstrmEmissions != null ? footprint.TotalScp3DnstrmEmissions : 0;
+                        Decimal upstream = footprint.TotalScp3UpstrmEmissions != null ? footprint.TotalScp3UpstrmEmissions : 0;
+                        Decimal total = downstream + upstream;
+                        summary.totalEmissions += total;
+                        summary.scope3Emissions += total;
+                    }
+                    
+                    summary.unit = 'tCO2e';
+                    summary.lastModified = stationaryFootprints[0].LastModifiedDate;
+                    summaryMap.put('Stationary Asset', summary);
                 }
             }
 
@@ -90,11 +107,28 @@ public with sharing class AnnualEmissionInventoryController {
                     FROM VehicleAssetCrbnFtprnt 
                     WHERE AnnualEmssnInventoryId = :inventoryId
                     ORDER BY CreatedDate DESC
-                    LIMIT 10
                 ];
 
-                for (VehicleAssetCrbnFtprnt footprint : vehicleFootprints) {
-                    allFootprints.add(new CarbonFootprintWrapper(footprint, 'Vehicle Asset'));
+                if (!vehicleFootprints.isEmpty()) {
+                    CarbonFootprintSummary summary = new CarbonFootprintSummary();
+                    summary.type = 'Vehicle Asset';
+                    summary.recordCount = vehicleFootprints.size();
+                    summary.totalEmissions = 0;
+                    summary.scope1Emissions = 0;
+                    summary.scope2Emissions = 0;
+                    summary.scope3Emissions = 0;
+                    
+                    for (VehicleAssetCrbnFtprnt footprint : vehicleFootprints) {
+                        Decimal downstream = footprint.TotalScp3DnstrmEmissions != null ? footprint.TotalScp3DnstrmEmissions : 0;
+                        Decimal upstream = footprint.TotalScp3UpstrmEmissions != null ? footprint.TotalScp3UpstrmEmissions : 0;
+                        Decimal total = downstream + upstream;
+                        summary.totalEmissions += total;
+                        summary.scope3Emissions += total;
+                    }
+                    
+                    summary.unit = 'tCO2e';
+                    summary.lastModified = vehicleFootprints[0].LastModifiedDate;
+                    summaryMap.put('Vehicle Asset', summary);
                 }
             }
 
@@ -105,16 +139,24 @@ public with sharing class AnnualEmissionInventoryController {
                     FROM Scope3CrbnFtprnt 
                     WHERE AnnualEmssnInventoryId = :inventoryId
                     ORDER BY CreatedDate DESC
-                    LIMIT 10
                 ];
 
-                for (Scope3CrbnFtprnt footprint : scope3Footprints) {
-                    allFootprints.add(new CarbonFootprintWrapper(footprint, 'Scope 3'));
+                if (!scope3Footprints.isEmpty()) {
+                    CarbonFootprintSummary summary = new CarbonFootprintSummary();
+                    summary.type = 'Scope 3';
+                    summary.recordCount = scope3Footprints.size();
+                    summary.totalEmissions = 0; // No total field available yet
+                    summary.scope1Emissions = 0;
+                    summary.scope2Emissions = 0;
+                    summary.scope3Emissions = 0;
+                    summary.unit = 'tCO2e';
+                    summary.lastModified = scope3Footprints[0].LastModifiedDate;
+                    summaryMap.put('Scope 3', summary);
                 }
             }
 
-            System.debug('Found ' + allFootprints.size() + ' carbon footprints for inventory: ' + inventoryId);
-            return allFootprints;
+            System.debug('Found ' + summaryMap.size() + ' carbon footprint types for inventory: ' + inventoryId);
+            return summaryMap.values();
 
         } catch (QueryException qe) {
             System.debug('Query Exception in getCarbonFootprints: ' + qe.getMessage());
@@ -123,6 +165,20 @@ public with sharing class AnnualEmissionInventoryController {
             System.debug('Exception in getCarbonFootprints: ' + e.getMessage());
             throw new AuraHandledException('Unexpected error occurred: ' + e.getMessage());
         }
+    }
+
+    /**
+     * @description Summary class for Carbon Footprint records grouped by type
+     */
+    public class CarbonFootprintSummary {
+        @AuraEnabled public String type { get; set; }
+        @AuraEnabled public Integer recordCount { get; set; }
+        @AuraEnabled public Decimal totalEmissions { get; set; }
+        @AuraEnabled public Decimal scope1Emissions { get; set; }
+        @AuraEnabled public Decimal scope2Emissions { get; set; }
+        @AuraEnabled public Decimal scope3Emissions { get; set; }
+        @AuraEnabled public String unit { get; set; }
+        @AuraEnabled public DateTime lastModified { get; set; }
     }
 
     /**

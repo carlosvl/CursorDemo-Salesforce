@@ -50,13 +50,40 @@ A comprehensive Lightning Web Component solution for Net Zero Cloud that display
 **Features:**
 - Interactive data table showing Annual Emission Inventory records for Accounts
 - Row selection with "View Details" button functionality
-- Related Carbon Footprint display in beautiful responsive cards
+- **Visual Carbon Footprint Distribution Chart** - Custom bar chart showing emission distribution by type
+- Carbon footprint summary aggregation by type (Stationary Asset, Vehicle Asset, Scope 3)
+- Related Carbon Footprint display in beautiful responsive cards with scope breakdowns
 - Smart emission value formatting (max 4 decimal places)
 - Real-time data integration with Net Zero Cloud objects
+- CSP-compliant visualization (no external chart libraries required)
 - Responsive design for desktop and mobile
 - Comprehensive error handling and empty state management
 
-**Deployment Package:** `deployment/AnnualEmissionInventoryLWC-Deployment.zip` - Complete deployment package with instructions
+**Chart Visualization:**
+The component includes a custom-built bar chart that displays carbon footprint distribution by type without requiring external JavaScript libraries. Each footprint type is color-coded with proportional bars showing both absolute values (tCO2e) and percentages of total emissions. The chart is positioned between the data table and detail cards for optimal user experience.
+
+**Data Integration:**
+Seamlessly integrates with Net Zero Cloud objects including:
+- `AnnualEmssnInventory` - Main emission inventory records
+- `StnryAssetCrbnFtprnt` - Stationary asset carbon footprints  
+- `VehicleAssetCrbnFtprnt` - Vehicle asset carbon footprints
+- `Scope3CrbnFtprnt` - Scope 3 carbon footprints
+
+**Use Case Walkthrough:**
+1. **Navigate** to any Account record page with the component installed
+2. **View** Annual Emission Inventory records in an interactive data table
+3. **Click** "View Details" button on any inventory row to expand carbon footprint analysis
+4. **Analyze** the visual bar chart showing emission distribution by asset type
+5. **Review** detailed carbon footprint cards with scope-level breakdowns (Scope 1, 2, 3)
+6. **Compare** different inventory years and their emission patterns
+
+**Technical Implementation Highlights:**
+- **CSP Compliance:** Custom chart implementation avoids Content Security Policy restrictions
+- **Performance Optimized:** Cacheable Apex methods with efficient SOQL queries
+- **Error Resilient:** Graceful handling of missing data and permission issues
+- **Accessibility:** Responsive design with proper color contrast and mobile optimization
+
+**Deployment Package:** `AnnualEmissionInventoryLWC-Deployment.zip` - Complete deployment package with instructions
 
 ### 4. 📋 Technical Documentation
 **File:** `TAXI_TRIP_SOLUTION.md`
@@ -131,7 +158,7 @@ sf project deploy start --source-dir force-app/main/default/flows/
 
 ### Deploy Annual Emission Inventory LWC:
 ```bash
-# Deploy complete LWC solution
+# Deploy complete LWC solution with chart visualization
 sf project deploy start --source-dir force-app/main/default/lwc/annualEmissionInventoryList/
 sf project deploy start --source-dir force-app/main/default/classes/AnnualEmissionInventoryController.cls
 sf project deploy start --source-dir force-app/main/default/classes/AnnualEmissionInventoryControllerTest.cls
@@ -141,6 +168,11 @@ cd deployment
 unzip AnnualEmissionInventoryLWC-Deployment.zip
 sf project deploy start --source-dir AnnualEmissionInventoryLWC/
 ```
+
+**Post-Deployment Setup:**
+1. Add the component to Account record pages via Lightning App Builder
+2. Ensure users have read access to Net Zero Cloud objects
+3. Test the chart visualization by clicking "View Details" on inventory records
 
 ## Development Workflow
 

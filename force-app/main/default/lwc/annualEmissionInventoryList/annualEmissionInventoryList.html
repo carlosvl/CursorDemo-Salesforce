@@ -59,6 +59,36 @@
                     </div>
                 </template>
 
+                <!-- Chart Section -->
+                <template if:true={hasChartData}>
+                    <div class="slds-m-bottom_large">
+                        <div class="chart-container">
+                            <h3 class="slds-text-heading_medium slds-m-bottom_medium slds-text-align_center">
+                                Carbon Footprint Distribution by Type
+                            </h3>
+                            <div class="chart-visual">
+                                <template for:each={pieChartData} for:item="chartItem" for:index="index">
+                                    <div key={chartItem.label} class="chart-bar-item">
+                                        <div class="chart-bar-container">
+                                            <div class="chart-bar-label">
+                                                <span class="chart-color-indicator" data-index={index}></span>
+                                                <span class="chart-label-text">{chartItem.label}</span>
+                                            </div>
+                                            <div class="chart-bar-wrapper">
+                                                <div class="chart-bar" data-index={index} data-percentage={chartItem.percentage}></div>
+                                            </div>
+                                            <div class="chart-bar-value">
+                                                <div class="chart-value-main">{chartItem.value} tCO2e</div>
+                                                <div class="chart-value-percentage">({chartItem.percentage}%)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
                 <!-- Carbon Footprints Grid -->
                 <template if:true={carbonFootprints}>
                     <template if:true={carbonFootprints.length}>
@@ -79,7 +109,7 @@
                                             </header>
                                         </div>
                                         <div class="slds-card__body slds-card__body_inner">
-                                            <p class="slds-text-body_regular slds-m-bottom_x-small">
+                                            <p class="slds-text-body_regular slds-m-bottom_small">
                                                 <strong>{footprint.name}</strong>
                                             </p>
                                             <div class="slds-text-align_center slds-p-vertical_small">
@@ -88,8 +118,28 @@
                                                 </span>
                                                 <br/>
                                                 <span class="slds-text-body_small slds-text-color_weak">
-                                                    {footprint.unit}
+                                                    Total {footprint.unit}
                                                 </span>
+                                            </div>
+                                            <div class="slds-grid slds-wrap slds-gutters_x-small slds-m-top_small">
+                                                <div class="slds-col slds-size_1-of-3">
+                                                    <div class="slds-text-align_center">
+                                                        <div class="slds-text-body_small slds-text-color_weak">Scope 1</div>
+                                                        <div class="slds-text-body_regular">{footprint.scope1}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-3">
+                                                    <div class="slds-text-align_center">
+                                                        <div class="slds-text-body_small slds-text-color_weak">Scope 2</div>
+                                                        <div class="slds-text-body_regular">{footprint.scope2}</div>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-col slds-size_1-of-3">
+                                                    <div class="slds-text-align_center">
+                                                        <div class="slds-text-body_small slds-text-color_weak">Scope 3</div>
+                                                        <div class="slds-text-body_regular">{footprint.scope3}</div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </article>

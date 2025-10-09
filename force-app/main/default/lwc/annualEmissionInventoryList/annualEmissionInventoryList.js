@@ -14,6 +14,7 @@ export default class AnnualEmissionInventoryList extends LightningElement {
     carbonFootprints = [];
     carbonFootprintError;
     showCarbonFootprints = false;
+    pieChartData = [];
 
     // Define columns for the data table
     columns = [
@@ -223,18 +224,19 @@ export default class AnnualEmissionInventoryList extends LightningElement {
             const footprintsData = await getCarbonFootprints({ inventoryId: this.selectedRowId });
             
             if (footprintsData && footprintsData.length > 0) {
-                // Map the data to match our display format with proper decimal formatting
-                this.carbonFootprints = footprintsData.map(footprint => ({
-                    id: footprint.id,
-                    type: footprint.type,
-                    name: footprint.name,
-                    emissions: footprint.totalEmissions,
-                    formattedEmissions: this.formatEmissionValue(footprint.totalEmissions),
-                    unit: footprint.unit,
-                    scope1: footprint.scope1Emissions,
-                    scope2: footprint.scope2Emissions,
-                    scope3: footprint.scope3Emissions,
-                    lastModified: footprint.lastModified
+                // Map the summary data to match our display format with proper decimal formatting
+                this.carbonFootprints = footprintsData.map(summary => ({
+                    id: summary.type.replace(/\s+/g, ''), // Use type as ID (remove spaces)
+                    type: summary.type,
+                    name: `${summary.recordCount} ${summary.type} Record${summary.recordCount !== 1 ? 's' : ''}`,
+                    emissions: summary.totalEmissions,
+                    formattedEmissions: this.formatEmissionValue(summary.totalEmissions),
+                    unit: summary.unit,
+                    scope1: this.formatEmissionValue(summary.scope1Emissions),
+                    scope2: this.formatEmissionValue(summary.scope2Emissions),
+                    scope3: this.formatEmissionValue(summary.scope3Emissions),
+                    recordCount: summary.recordCount,
+                    lastModified: summary.lastModified
                 }));
                 
                 console.log('Loaded', this.carbonFootprints.length, 'carbon footprints');
@@ -245,6 +247,9 @@ export default class AnnualEmissionInventoryList extends LightningElement {
             }
             
             this.carbonFootprintError = undefined;
+            
+            // Update chart configuration after data is loaded
+            this.updateChartConfig();
             
         } catch (error) {
             this.carbonFootprintError = error;
@@ -281,7 +286,56 @@ export default class AnnualEmissionInventoryList extends LightningElement {
                     }
                 ];
                 this.carbonFootprintError = undefined;
+                
+                // Update chart configuration for sample data too
+                this.updateChartConfig();
             }
+        }
+    }
+
+    // Update chart data for visual representation
+    updateChartConfig() {
+        if (!this.carbonFootprints || this.carbonFootprints.length === 0) {
+            this.pieChartData = [];
+            return;
+        }
+
+        // Calculate total emissions
+        const totalEmissions = this.carbonFootprints.reduce((total, footprint) => {
+            return total + (footprint.emissions || 0);
+        }, 0);
+
+        // Prepare data with percentages for visual chart
+        this.pieChartData = this.carbonFootprints.map(footprint => {
+            const value = footprint.emissions || 0;
+            const percentage = totalEmissions > 0 ? (value / totalEmissions) * 100 : 0;
+            return {
+                label: footprint.type,
+                value: this.formatEmissionValue(value),
+                rawValue: value,
+                percentage: percentage.toFixed(1)
+            };
+        });
+
+        console.log('Chart data updated:', this.pieChartData);
+    }
+
+    // Getter for chart data
+    get hasChartData() {
+        return this.carbonFootprints && this.carbonFootprints.length > 0;
+    }
+
+    // Update chart bar widths after rendering
+    renderedCallback() {
+        if (this.pieChartData && this.pieChartData.length > 0) {
+            // Set bar widths based on percentage
+            const chartBars = this.template.querySelectorAll('.chart-bar');
+            chartBars.forEach(bar => {
+                const percentage = bar.dataset.percentage;
+                if (percentage) {
+                    bar.style.width = percentage + '%';
+                }
+            });
         }
     }
 
