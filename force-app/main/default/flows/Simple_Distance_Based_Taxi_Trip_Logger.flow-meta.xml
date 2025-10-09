@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>65.0</apiVersion>
+    <description>Simplified taxi trip logging using distance instead of the complex Vehicle Asset workaround. Uses GroundTravelEnrgyUse with distance fields.</description>
+    <environments>Default</environments>
+    <interviewLabel>Simple Distance-Based Taxi Trip Logger {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Simple Distance-Based Taxi Trip Logger</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordCreates>
+        <description>Create the Ground Travel Energy Use record with distance-based data</description>
+        <name>Create_Taxi_Trip_Record</name>
+        <label>Create Taxi Trip Record</label>
+        <locationX>176</locationX>
+        <locationY>458</locationY>
+        <connector>
+            <targetReference>Success_Screen</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>Distance</field>
+            <value>
+                <elementReference>TripDistance</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>DistanceUnit</field>
+            <value>
+                <elementReference>DistanceUnit</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>VehicleType</field>
+            <value>
+                <stringValue>Taxi</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>TripDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>TripDescription</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Scope3Category</field>
+            <value>
+                <stringValue>BusinessTravel</stringValue>
+            </value>
+        </inputAssignments>
+        <object>GroundTravelEnrgyUse</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <screens>
+        <description>Information screen explaining the new simplified process</description>
+        <name>Info_Screen</name>
+        <label>Information: No More Complex Workarounds!</label>
+        <locationX>176</locationX>
+        <locationY>158</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Trip_Input_Screen</targetReference>
+        </connector>
+        <fields>
+            <name>InfoDisplay</name>
+            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 16px; color: rgb(0, 112, 210);&quot;&gt;🎉 Good News! Distance-Based Taxi Trips Are Now Simple!&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;❌ OLD WAY (Complex):&lt;/b&gt;&lt;/p&gt;&lt;p&gt;• Create Vehicle Asset&lt;/p&gt;&lt;p&gt;• Set up scope allocation&lt;/p&gt;&lt;p&gt;• Find emissions factor set&lt;/p&gt;&lt;p&gt;• Create VAEU records&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b style=&quot;color: rgb(0, 153, 0);&quot;&gt;✅ NEW WAY (Simple):&lt;/b&gt;&lt;/p&gt;&lt;p&gt;• Just enter distance and trip details&lt;/p&gt;&lt;p&gt;• Ground Travel now supports distance fields&lt;/p&gt;&lt;p&gt;• Automatic emissions calculation&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;i&gt;This flow eliminates the technical debt and uses the proper Ground Travel object with distance tracking.&lt;/i&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <description>Simple input screen for taxi trip details</description>
+        <name>Trip_Input_Screen</name>
+        <label>Enter Taxi Trip Details</label>
+        <locationX>176</locationX>
+        <locationY>278</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Create_Taxi_Trip_Record</targetReference>
+        </connector>
+        <fields>
+            <name>TripDate</name>
+            <dataType>Date</dataType>
+            <defaultValue>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </defaultValue>
+            <fieldText>Trip Date</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>When did the taxi trip occur?</helpText>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <fields>
+            <name>TripDistance</name>
+            <dataType>Number</dataType>
+            <fieldText>Trip Distance</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>How far was the taxi trip?</helpText>
+            <isRequired>true</isRequired>
+            <scale>2</scale>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <fields>
+            <name>DistanceUnit</name>
+            <choiceReferences>Miles</choiceReferences>
+            <choiceReferences>Kilometers</choiceReferences>
+            <dataType>String</dataType>
+            <defaultValue>
+                <stringValue>Miles</stringValue>
+            </defaultValue>
+            <fieldText>Distance Unit</fieldText>
+            <fieldType>DropdownBox</fieldType>
+            <helpText>Select the unit for the distance measurement</helpText>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <fields>
+            <name>TripDescription</name>
+            <dataType>String</dataType>
+            <fieldText>Trip Description (Optional)</fieldText>
+            <fieldType>InputField</fieldType>
+            <helpText>Brief description of the business purpose</helpText>
+            <isRequired>false</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <description>Success confirmation screen</description>
+        <name>Success_Screen</name>
+        <label>Taxi Trip Logged Successfully!</label>
+        <locationX>176</locationX>
+        <locationY>638</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>SuccessMessage</name>
+            <fieldText>&lt;p&gt;&lt;b style=&quot;font-size: 16px; color: rgb(0, 153, 0);&quot;&gt;✅ Success! Your taxi trip has been logged.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;Trip Details:&lt;/b&gt;&lt;/p&gt;&lt;p&gt;• Distance: {!TripDistance} {!DistanceUnit}&lt;/p&gt;&lt;p&gt;• Date: {!TripDate}&lt;/p&gt;&lt;p&gt;• Record ID: {!Create_Taxi_Trip_Record}&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;i&gt;The system will automatically calculate emissions based on the distance using standard taxi emission factors.&lt;/i&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;b style=&quot;color: rgb(0, 112, 210);&quot;&gt;💡 Pro Tip:&lt;/b&gt; You can now use Ground Travel Energy Use directly for all distance-based trips - no more complex workarounds needed!&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Info_Screen</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <choices>
+        <name>Miles</name>
+        <choiceText>Miles</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Miles</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <name>Kilometers</name>
+        <choiceText>Kilometers</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Kilometers</stringValue>
+        </value>
+    </choices>
+</Flow>

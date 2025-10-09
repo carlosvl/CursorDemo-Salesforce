@@ -1,0 +1,47 @@
+/* Annual Emission Inventory List Component Styles */
+
+.slds-max-medium-table_stacked {
+    border: 1px solid #d8dde6;
+    border-radius: 0.25rem;
+}
+
+/* Custom styling for empty state */
+.empty-state-container {
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state-icon {
+    color: #706e6b;
+    margin-bottom: 1rem;
+}
+
+.empty-state-message {
+    color: #706e6b;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .slds-p-horizontal_medium {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Custom error state styling */
+.error-message {
+    background-color: #fdf2f2;
+    border: 1px solid #fed7d7;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.error-message h2 {
+    color: #742a2a;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+}

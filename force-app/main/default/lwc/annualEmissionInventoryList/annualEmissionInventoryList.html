@@ -1,0 +1,47 @@
+<template>
+    <lightning-card title={cardTitle} icon-name="custom:custom19">
+        <div class="slds-p-horizontal_medium">
+            <!-- Loading spinner -->
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center slds-p-vertical_medium">
+                    <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- Error message -->
+            <template if:true={error}>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                    <span class="slds-assistive-text">Error</span>
+                    <lightning-icon icon-name="utility:error" size="x-small" class="slds-m-right_x-small"></lightning-icon>
+                    <h2>Error loading emission inventories: {error.body.message}</h2>
+                </div>
+            </template>
+
+            <!-- Data table with records -->
+            <template if:true={hasRecords}>
+                <lightning-datatable
+                    key-field="Id"
+                    data={emissionInventories}
+                    columns={columns}
+                    hide-checkbox-column="true"
+                    show-row-number-column="false"
+                    resize-column-disabled="true"
+                    class="slds-max-medium-table_stacked">
+                </lightning-datatable>
+            </template>
+
+            <!-- No records message -->
+            <template if:false={hasRecords}>
+                <template if:false={isLoading}>
+                    <div class="slds-align_absolute-center slds-p-vertical_large">
+                        <div class="slds-text-color_weak">
+                            <lightning-icon icon-name="custom:custom19" size="large" class="slds-m-bottom_small"></lightning-icon>
+                            <p class="slds-text-heading_medium">No Annual Emission Inventories found</p>
+                            <p class="slds-text-body_regular">There are no emission inventory records associated with this account.</p>
+                        </div>
+                    </div>
+                </template>
+            </template>
+        </div>
+    </lightning-card>
+</template>
